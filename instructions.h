@@ -1,0 +1,20 @@
+// copyright 2017 Philip Bohun
+#ifndef INSTRUCTIONS_H
+#define INSTRUCTIONS_H
+
+enum instr {
+	CLF,
+	MOV, FMOV,
+	MVS, MVL, LDI, LDF,
+	PSH, POP,
+	ADD, SUB, MUL, DIV,
+	FADD, FSUB, FMUL, FDIV,
+	JLZ, JGZ, JEZ, JNZ, JMP,
+	SHL, SHR,
+	BAND, BOR, BNOT, BXOR,
+	LAND, LOR, LNOT,
+	HLT,
+	NUM_INSTRUCTIONS
+};
+
+#endif // INSTRUCTIONS_H
