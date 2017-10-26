@@ -43,7 +43,7 @@ void main() {
 	// create new cpu with the given u64 array for memory
 	cpu *c = new_cpu(b);
 
-	run(c);
+	run_cpu(c);
 
 	printf("registers:\n");
 	print_registers(c);

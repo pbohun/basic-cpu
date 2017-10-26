@@ -10,12 +10,13 @@
 
 enum registers {
 	R0, R1, R2, R3, R4, R5, R6, R7,
-        F0, F1, F2, F3, F4, F5, F6, F7,
+	F0, F1, F2, F3, F4, F5, F6, F7,
 	NUM_REGISTERS
 };
 
 typedef struct {
 	u64 *mem;
+	u64 max_mem;
 
 	// registers
 	u64 pc;
