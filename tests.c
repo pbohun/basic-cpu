@@ -24,12 +24,14 @@ void run_float_tests();
 void run_bitwise_tests();
 void run_logic_tests();
 
-void main() {
+int main() {
 	run_integer_tests();
 	run_float_tests();
 	run_bitwise_tests();
 	run_logic_tests();
 	printf("All tests passed\n");
+
+	return 0;
 }
 
 void run_integer_tests() {

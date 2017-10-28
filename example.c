@@ -26,7 +26,7 @@ void print_fregisters(cpu *c) {
 	printf("%f\n", c->fr[7]);
 }
 
-void main() {
+int main() {
 	u64 b[] = {
 		LII, R0, 1,
 		LII, R1, 5,
@@ -52,7 +52,5 @@ void main() {
 
 	free_cpu(c);
 
-	// normally, you'd call free_cpu(c) here, but since we allocated 
-	// b on the stack we can't call it here as it would call a 
-	// double free error. Use malloc in "real life"!
+	return 0;
 }
