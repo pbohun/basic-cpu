@@ -2,6 +2,10 @@
 This is a very simple, compact, virtual cpu written in c.
 It's a project for fun and learning, so feel free to play around with it to try out different ideas. Don't be surprised if you find some bugs. 
 
+You can find a video walkthrough of the cpu here:
+
+https://www.youtube.com/watch?v=cfPDeso3XwI
+
 ## Prerequisites
 You'll need a c compiler that compiles to the c99 standard, and git is recommended.
 
