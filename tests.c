@@ -3,7 +3,7 @@
 #include <assert.h>
 #include "cpu.h"
 
-#define MAX_MEM 100
+#define MAX_MEM 43
 
 void print_registers(cpu *c) {
 	for (int i = 0; i < 7; i++) {
@@ -21,108 +21,137 @@ void print_float_registers(cpu *c) {
 
 void run_integer_tests();
 void run_float_tests();
-// TODO: create tests for bitwise and logical operations
+void run_bitwise_tests();
+void run_logic_tests();
 
 void main() {
 	run_integer_tests();
 	run_float_tests();
+	run_bitwise_tests();
+	run_logic_tests();
 	printf("All tests passed\n");
 }
 
 void run_integer_tests() {
 	printf("Running tests on integer instructions\n");
-	u64 *mem = malloc(sizeof(u64) * MAX_MEM);
 
-	// calc factorial of 5
-	mem[0] = LDI | (R0 << 8);
-	mem[1] = 1;
-	mem[2] = LDI | (R1 << 8);
-	mem[3] = 5;
-	mem[4] = MOV | (R2 << 8) | (R0 << 16);
-	mem[5] = MUL | (R0 << 8) | (R1 << 16);
-	mem[6] = SUB | (R1 << 8) | (R2 << 16);
-	mem[7] = JNZ;
-	mem[8] = 4;
-	// push and pop
-	mem[9] = PSH | (R0 << 8);
-	mem[10] = POP | (R7 << 8);
-	// divide R7 by 2
-	mem[11] = LDI | (R6 << 8);
-	mem[12] = 2;
-	mem[13] = DIV | (R7 << 8) | (R6 << 16);
-	// mov store and load
-	mem[14] = MVS;
-	mem[15] = 50;
-	mem[16] = R7;
-	mem[17] = MVL;
-	mem[18] = R5;
-	mem[19] = 50;
-	// add 1 to R7
-	mem[20] = ADD | (R7 << 8) | (R2 << 16);
-	mem[21] = HLT;
-	
+	u64 mem[] = {
+		LII, R0, 1,
+		LII, R1, 5,
+		MOV, R2, R0,
+		MUL, R0, R1,
+		SUB, R1, R2,
+		JNZ, 8,
+		PSH, R0,
+		POP, R7,
+		LII, R6, 2,
+		DIV, R7, R6,
+		STI, 40, R7,
+		LDI, R5, 40,
+		ADD, R7, R2,
+		HLT,
+		0, 0, 0,
+		0, 0, 0
+	};
+
 	cpu *c = new_cpu(mem, MAX_MEM);
 	run_cpu(c);
 	print_registers(c);
-	printf("mem50:%lu\n", c->mem[50]);
 	assert(c->r[0] == 120);
 	assert(c->r[7] == 61);
-	assert(c->mem[50] == 60);
+	assert(c->mem[40] == 60);
 	assert(c->r[5] == 60);
 
 	free_cpu(c);
-	free(mem);
 
 	printf("All integer tests passed\n");
 }
 
 void run_float_tests() {
-	printf("Running tests on floating point instructions\n");
-	u64 *mem = malloc(sizeof(u64) * MAX_MEM);
+	printf("Running tests on float instructions\n");
 
-	printf("float r0: %d\n", F0);
+	u64 mem[] = {
+		LIF, F0, 1.0,
+		LIF, F1, 5.0,
+		MOVF, F2, F0,
+		FMUL, F0, F1,
+		FSUB, F1, F2,
+		JNZ, 8,
+		PSHF, F0,
+		POPF, F7,
+		LIF, F6, 2.0,
+		FDIV, F7, F6,
+		STF, 40, F7, // 27, 28, 29
+		LDF, F5, 40, // 30, 31, 32
+		FADD, F7, F2,
+		HLT,
+		0, 0, 0,
+		0, 0, 0
+	};
 
-	// calc factorial of 5
-	mem[0] = LDI | (F0 << 8);
-	mem[1] = 1.0;
-	mem[2] = LDI | (F1 << 8);
-	mem[3] = 5.0;
-	mem[4] = MOV | (F2 << 8) | (F0 << 16);
-	mem[5] = FMUL | (F0 << 8) | (F1 << 16);
-	mem[6] = FSUB | (F1 << 8) | (F2 << 16);
-	mem[7] = JNZ;
-	mem[8] = 4;
-	// push and pop
-	mem[9] = PSH | (F0 << 8);
-	mem[10] = POP | (F7 << 8);
-	// divide F7 by 2
-	mem[11] = LDI | (F6 << 8);
-	mem[12] = 2.0;
-	mem[13] = FDIV | (F7 << 8) | (F6 << 16);
-	// mov store and load
-	mem[14] = MVS;
-	mem[15] = 50;
-	mem[16] = F7;
-	mem[17] = MVL;
-	mem[18] = F5;
-	mem[19] = 50;
-	// add 1 to F7
-	mem[20] = FADD | (F7 << 8) | (F2 << 16);
-	mem[21] = HLT;
-	
 	cpu *c = new_cpu(mem, MAX_MEM);
-	printf("new cpu created\n");
 	run_cpu(c);
-	print_registers(c);
 	print_float_registers(c);
-	printf("mem50:%lu\n", c->mem[50]);
-	assert(c->fr[0] == 120);
-	assert(c->fr[7] == 61);
-	assert(c->mem[50] == 60);
-	assert(c->fr[5] == 60);
+	assert(c->fr[0] == 120.0);
+	assert(c->fr[7] == 61.0);
+	assert((f64)c->mem[40] == 60.0);
+	assert(c->fr[5] == 60.0);
 
 	free_cpu(c);
-	free(mem);
 
-	printf("All floating point tests passed\n");
+	printf("All integer tests passed\n");
+}
+
+void run_bitwise_tests() {
+	printf("Running tests on bitwise instructions\n");
+
+	u64 mem[] = {
+		LII, R0, 5,
+		LII, R1, 3,
+		LII, R2, 6,
+		BOR, R0, R1,
+		MOV, R3, R0,
+		SUB, R3, R2,
+		BXOR, R1, R2,
+		LII, R4, 7,
+		BNOT, R4,
+		LII, R5, 5,
+		LII, R6, 3,
+		BAND, R5, R6,
+		LII, R7, 1,
+		SHL, R7, 2,
+		SHR, R7, 1,
+		HLT
+	};
+
+	cpu *c = new_cpu(mem, 45);
+	run_cpu(c);
+	print_registers(c);
+
+	free_cpu(c);
+
+	printf("All bitwise tests passed\n");
+}
+
+void run_logic_tests() {
+	printf("Running tests on logic instructions\n");
+
+	u64 mem[] = {
+		LII, R0, 1,
+		LII, R1, 0,
+		LII, R2, 1,
+		LII, R3, 1,
+		LAND, R0, R1,
+		LOR, R1, R2,
+		LNOT, R3,
+		HLT, 0, 0
+	};
+
+	cpu *c = new_cpu(mem, 23);
+	run_cpu(c);
+	print_registers(c);
+
+	free_cpu(c);
+
+	printf("All logic tests passed\n");
 }

@@ -4,9 +4,11 @@
 
 enum instr {
 	CLF,
-	MOV, FMOV,
-	MVS, MVL, LDI, LDF,
+	MOV, MOVF,
+	STI, STF, LDI, LDF,
+	LII, LIF,
 	PSH, POP,
+	PSHF, POPF,
 	ADD, SUB, MUL, DIV,
 	FADD, FSUB, FMUL, FDIV,
 	JLZ, JGZ, JEZ, JNZ, JMP,

@@ -27,21 +27,21 @@ void print_fregisters(cpu *c) {
 }
 
 void main() {
-
 	u64 b[] = {
-		LDI | (R0 << 8), 1, 		// load 1 into register 0
-		LDI | (R1 << 8), 5,		// load 5 into register 1
-		LDI | (R2 << 8), 1,		// load 1 into register 2
-		MUL | (R0 << 8) | (R1 << 16),	// multiply R0 and R1, store in R0
-		SUB | (R1 << 8) | (R2 << 16),	// subtract R2 from R1
-		JNZ, 5,				// jump to address 5 if not zero
-		HLT				// halt
+		LII, R0, 1,
+		LII, R1, 5,
+		LII, R2, 1,
+		MUL, R0, R1,
+		SUB, R1, R2,
+		JNZ, 8,
+		HLT 
 	};
+
 	printf("instructions:\n");
-	print_list(b, 11);
+	print_list(b, 18);
 
 	// create new cpu with the given u64 array for memory
-	cpu *c = new_cpu(b);
+	cpu *c = new_cpu(b, 18);
 
 	run_cpu(c);
 
@@ -49,6 +49,8 @@ void main() {
 	print_registers(c);
 	printf("floating registers:\n");
 	print_fregisters(c);
+
+	free_cpu(c);
 
 	// normally, you'd call free_cpu(c) here, but since we allocated 
 	// b on the stack we can't call it here as it would call a 
