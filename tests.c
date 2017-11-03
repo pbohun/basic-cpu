@@ -43,13 +43,14 @@ void run_integer_tests() {
 		MOV, R2, R0,
 		MUL, R0, R1,
 		SUB, R1, R2,
+		CMPI, R1, 0,
 		JNZ, 8,
 		PSH, R0,
 		POP, R7,
 		LII, R6, 2,
 		DIV, R7, R6,
-		STI, 40, R7,
-		LDI, R5, 40,
+		STI, 42, R7,
+		LDI, R5, 42,
 		ADD, R7, R2,
 		HLT,
 		0, 0, 0,
@@ -61,7 +62,7 @@ void run_integer_tests() {
 	print_registers(c);
 	assert(c->r[0] == 120);
 	assert(c->r[7] == 61);
-	assert(c->mem[40] == 60);
+	assert(c->mem[42] == 60);
 	assert(c->r[5] == 60);
 
 	free_cpu(c);
@@ -76,16 +77,17 @@ void run_float_tests() {
 		LIF, F0, 1.0,
 		LIF, F1, 5.0,
 		MOVF, F2, F0,
-		FMUL, F0, F1,
-		FSUB, F1, F2,
+		MULF, F0, F1,
+		SUBF, F1, F2,
+		CMPFI, F1, 0,
 		JNZ, 8,
 		PSHF, F0,
 		POPF, F7,
 		LIF, F6, 2.0,
-		FDIV, F7, F6,
-		STF, 40, F7, // 27, 28, 29
-		LDF, F5, 40, // 30, 31, 32
-		FADD, F7, F2,
+		DIVF, F7, F6,
+		STF, 42, F7, // 27, 28, 29
+		LDF, F5, 42, // 30, 31, 32
+		ADDF, F7, F2,
 		HLT,
 		0, 0, 0,
 		0, 0, 0
@@ -96,7 +98,7 @@ void run_float_tests() {
 	print_float_registers(c);
 	assert(c->fr[0] == 120.0);
 	assert(c->fr[7] == 61.0);
-	assert((f64)c->mem[40] == 60.0);
+	assert((f64)c->mem[42] == 60.0);
 	assert(c->fr[5] == 60.0);
 
 	free_cpu(c);

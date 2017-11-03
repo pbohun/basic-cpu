@@ -9,11 +9,6 @@
 void execute(cpu *c);
 void fetch(cpu *c);
 
-void *get_loc(cpu *c, u64 num) {
-	if (num < 8) return &c->r[num];
-	if (num >= 8) return &c->fr[num - 8];
-}
-
 cpu *new_cpu(u64 *memory, u64 mem_size) {
 	cpu *c = malloc(sizeof(cpu));
 	c->mem = memory;
@@ -38,6 +33,8 @@ void run_cpu(cpu *c) {
 void fetch(cpu *c) {
 	c->pc++;
 	c->inst = c->mem[c->pc] & FIRST_BYTE;
+	c->dest = c->mem[c->pc+1];
+	c->src = c->mem[c->pc+2];
 }
 
 void execute(cpu *c) {
@@ -45,36 +42,52 @@ void execute(cpu *c) {
 		case CLF:
 			clear_flags(c);
 			break;
+		case CMP:
+			set_flags(c, c->r[c->dest], c->r[c->src]);
+			c->pc += 2;
+			break;
+		case CMPI:
+			set_flags(c, c->r[c->dest], c->src);
+			c->pc += 2;
+			break;
+		case CMPF:
+			fset_flags(c, c->fr[c->dest - 8], (f64)c->fr[c->src - 8]);
+			c->pc += 2;
+			break;
+		case CMPFI:
+			fset_flags(c, c->fr[c->dest - 8], (f64)c->src);
+			c->pc += 2;
+			break;
 		case MOV:
-			c->r[c->mem[c->pc+1]] = c->r[c->mem[c->pc+2]];
+			c->r[c->dest] = c->r[c->src];
 			c->pc += 2;
 			break;
 		case MOVF:
-			c->fr[c->mem[c->pc+1]-8] = c->fr[c->mem[c->pc+2]-8];
+			c->fr[c->dest - 8] = c->fr[c->src - 8];
 			c->pc += 2;
 			break;
 		case STI:
-			c->mem[c->mem[c->pc+1]] = c->r[c->mem[c->pc+2]];
+			c->mem[c->dest] = c->r[c->src];
 			c->pc += 2;
 			break;
 		case STF:
-			c->mem[c->mem[c->pc+1]] = (u64)c->fr[c->mem[c->pc+2]-8];
+			c->mem[c->dest] = (u64)c->fr[c->src - 8];
 			c->pc += 2;
 			break;
 		case LDI:
-			c->r[c->mem[c->pc+1]] = c->mem[c->mem[c->pc+2]];
+			c->r[c->dest] = c->mem[c->src];
 			c->pc += 2;
 			break;
 		case LDF:
-			c->fr[c->mem[c->pc+1]-8] = (f64)c->mem[c->mem[c->pc+2]];
+			c->fr[c->dest - 8] = (f64)c->mem[c->src];
 			c->pc += 2;
 			break;
 		case LII:
-			c->r[c->mem[c->pc+1]] = c->mem[c->pc+2];
+			c->r[c->dest] = c->src;
 			c->pc += 2;
 			break;
 		case LIF:
-			c->fr[c->mem[c->pc+1]-8] = (f64)c->mem[c->pc+2];
+			c->fr[c->dest - 8] = (f64)c->src;
 			c->pc += 2;
 			break;
 		case PSH:
@@ -90,43 +103,35 @@ void execute(cpu *c) {
 			c->fr[c->mem[++c->pc]-8] = (f64)c->mem[c->sp++];
 			break;
 		case ADD:
-			c->r[c->mem[c->pc+1]] += c->r[c->mem[c->pc+2]];
-			set_flags(c, c->r[c->mem[c->pc+1]]);
+			c->r[c->dest] += c->r[c->src];
 			c->pc += 2;
 			break;
 		case SUB:
-			c->r[c->mem[c->pc+1]] -= c->r[c->mem[c->pc+2]];
-			set_flags(c, c->r[c->mem[c->pc+1]]);
+			c->r[c->dest] -= c->r[c->src];
 			c->pc += 2;
 			break;
 		case MUL:
-			c->r[c->mem[c->pc+1]] *= c->r[c->mem[c->pc+2]];
-			set_flags(c, c->r[c->mem[c->pc+1]]);
+			c->r[c->dest] *= c->r[c->src];
 			c->pc += 2;
 			break;
 		case DIV:
-			c->r[c->mem[c->pc+1]] /= c->r[c->mem[c->pc+2]];
-			set_flags(c, c->r[c->mem[c->pc+1]]);
+			c->r[c->dest] /= c->r[c->src];
 			c->pc += 2;
 			break;
-		case FADD:
-			c->fr[c->mem[c->pc+1]-8] += c->fr[c->mem[c->pc+2]-8];
-			fset_flags(c, c->fr[c->mem[c->pc+1]-8]);
+		case ADDF:
+			c->fr[c->dest - 8] += c->fr[c->src - 8];
 			c->pc +=2;
 			break;
-		case FSUB:
-			c->fr[c->mem[c->pc+1]-8] -= c->fr[c->mem[c->pc+2]-8];
-			fset_flags(c, c->fr[c->mem[c->pc+1]-8]);
+		case SUBF:
+			c->fr[c->dest - 8] -= c->fr[c->src - 8];
 			c->pc +=2;
 			break;
-		case FMUL:
-			c->fr[c->mem[c->pc+1]-8] *= c->fr[c->mem[c->pc+2]-8];
-			fset_flags(c, c->fr[c->mem[c->pc+1]-8]);
+		case MULF:
+			c->fr[c->dest - 8] *= c->fr[c->src - 8];
 			c->pc +=2;
 			break;
-		case FDIV:
-			c->fr[c->mem[c->pc+1]-8] /= c->fr[c->mem[c->pc+2]-8];
-			fset_flags(c, c->fr[c->mem[c->pc+1]-8]);
+		case DIVF:
+			c->fr[c->dest - 8] /= c->fr[c->src - 8];
 			c->pc +=2;
 			break;
 		case JLZ:
@@ -149,39 +154,39 @@ void execute(cpu *c) {
 			c->pc = c->mem[++(c->pc)];
 			break;
 		case SHL:
-			c->r[c->mem[c->pc+1]] <<= c->r[c->mem[c->pc+2]];
+			c->r[c->dest] <<= c->r[c->src];
 			c->pc += 2;
 			break;
 		case SHR:
-			c->r[c->mem[c->pc+1]] >>= c->r[c->mem[c->pc+2]];
+			c->r[c->dest] >>= c->r[c->src];
 			c->pc += 2;
 			break;
 		case BAND:
-			c->r[c->mem[c->pc+1]] &= c->r[c->mem[c->pc+2]];
+			c->r[c->dest] &= c->r[c->src];
 			c->pc += 2;
 			break;
 		case BOR:
-			c->r[c->mem[c->pc+1]] |= c->r[c->mem[c->pc+2]];
+			c->r[c->dest] |= c->r[c->src];
 			c->pc += 2;
 			break;
 		case BNOT:
-			c->r[c->mem[c->pc+1]] = ~c->r[c->mem[c->pc+1]];
+			c->r[c->dest] = ~c->r[c->src];
 			c->pc++;
 			break;
 		case BXOR:
-			c->r[c->mem[c->pc+1]] ^= c->r[c->mem[c->pc+2]];
+			c->r[c->dest] ^= c->r[c->src];
 			c->pc += 2;
 			break;
 		case LAND:
-			c->r[c->mem[c->pc+1]] = c->r[c->mem[c->pc+1]] && c->r[c->mem[c->pc+2]];
+			c->r[c->dest] = c->r[c->dest] && c->r[c->src];
 			c->pc += 2;
 			break;
 		case LOR:
-			c->r[c->mem[c->pc+1]] = c->r[c->mem[c->pc+1]] || c->r[c->mem[c->pc+2]];
+			c->r[c->dest] = c->r[c->dest] || c->r[c->src];
 			c->pc += 2;
 			break;
 		case LNOT:
-			c->r[c->mem[c->pc+1]] = !c->r[c->mem[c->pc+1]];
+			c->r[c->dest] = !c->r[c->dest];
 			c->pc++;
 			break;
 	}

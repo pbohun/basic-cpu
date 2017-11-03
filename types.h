@@ -29,10 +29,6 @@ typedef struct {
 	u64 dest;
 	u64 src;
 
-	// buses
-	u64 busA;
-	u64 busB;
-
 	// flags
 	u64 zero;
 	u64 ltz;
