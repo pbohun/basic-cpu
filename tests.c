@@ -3,8 +3,6 @@
 #include <assert.h>
 #include "cpu.h"
 
-#define MAX_MEM 43
-
 void print_registers(cpu *c) {
 	for (int i = 0; i < 7; i++) {
 		printf("%lu,", c->r[i]);
@@ -57,7 +55,7 @@ void run_integer_tests() {
 		0, 0, 0
 	};
 
-	cpu *c = new_cpu(mem, MAX_MEM);
+	cpu *c = new_cpu(mem, 46);
 	run_cpu(c);
 	print_registers(c);
 	assert(c->r[0] == 120);
@@ -93,7 +91,7 @@ void run_float_tests() {
 		0, 0, 0
 	};
 
-	cpu *c = new_cpu(mem, MAX_MEM);
+	cpu *c = new_cpu(mem, 46);
 	run_cpu(c);
 	print_float_registers(c);
 	assert(c->fr[0] == 120.0);
@@ -148,7 +146,18 @@ void run_logic_tests() {
 		LAND, R0, R1,
 		LOR, R1, R2,
 		LNOT, R3,
-		HLT, 0, 0
+		LII, R4, 5,
+		LII, R5, 6,
+		CMP, R4, R5,
+		JLZ, X,
+	    LDF, F0, 1.5,
+		LDF, F1, 1.5,
+		CMPF, F0, F1,
+		JEZ, X,
+		CMPFI, F0, 1,
+		JGZ, X
+		0, 0, 0
+		HLT
 	};
 
 	cpu *c = new_cpu(mem, 23);

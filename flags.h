@@ -9,14 +9,14 @@ void clear_flags(cpu *c) {
 }
 
 void set_flags(cpu *c, u64 a, u64 b) {
-	u64 res = a - b;
+	i64 res = a - b;
 	c->zero = (res == 0);
 	c->ltz = (res < 0);
 	c->gtz = (res > 0);
 }
 
 void fset_flags(cpu *c, f64 a, f64 b) {
-	u64 res = a - b;
+	f64 res = a - b;
 	c->zero = (res == 0);
 	c->ltz = (res < 0);
 	c->gtz = (res > 0);
