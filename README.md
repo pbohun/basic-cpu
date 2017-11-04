@@ -33,7 +33,7 @@ The example program calculates 5 factorial and stores the answer in the register
 ## Writing Programs
 Note that this is just a cpu. There are no mechanisms for input, output, monitors, long term storage, etc. You have to create memory for the cpu and fill it with machine code. An example of this is found in the `example.c` file.
 
-Everything in the cpu is 64 bit, defined as u64 and f64 for 64 bit floating point. Most instructions involve registers. Here's an example of what a move instruction would look like in an array of memory. Note that it's designed to look a lot like assembly language. 
+Everything in the cpu is 64 bit, defined as i64 and f64 for 64 bit floating point. Most instructions involve registers. Here's an example of what a move instruction would look like in an array of memory. Note that it's designed to look a lot like assembly language. 
 
 `MOV, R0, R1`
 
