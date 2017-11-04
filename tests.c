@@ -5,9 +5,9 @@
 
 void print_registers(cpu *c) {
 	for (int i = 0; i < 7; i++) {
-		printf("%lu,", c->r[i]);
+		printf("%llu,", c->r[i]);
 	}
-	printf("%lu\n", c->r[7]);
+	printf("%llu\n", c->r[7]);
 }
 
 void print_float_registers(cpu *c) {
@@ -21,12 +21,15 @@ void run_integer_tests();
 void run_float_tests();
 void run_bitwise_tests();
 void run_logic_tests();
+void run_jump_tests();
 
 int main() {
+	printf("Begin running tests\n");
 	run_integer_tests();
 	run_float_tests();
 	run_bitwise_tests();
 	run_logic_tests();
+	run_jump_tests();
 	printf("All tests passed\n");
 
 	return 0;
@@ -35,7 +38,7 @@ int main() {
 void run_integer_tests() {
 	printf("Running tests on integer instructions\n");
 
-	u64 mem[] = {
+	i64 mem[] = {
 		LII, R0, 1,
 		LII, R1, 5,
 		MOV, R2, R0,
@@ -64,14 +67,13 @@ void run_integer_tests() {
 	assert(c->r[5] == 60);
 
 	free_cpu(c);
-
 	printf("All integer tests passed\n");
 }
 
 void run_float_tests() {
 	printf("Running tests on float instructions\n");
 
-	u64 mem[] = {
+	i64 mem[] = {
 		LIF, F0, 1.0,
 		LIF, F1, 5.0,
 		MOVF, F2, F0,
@@ -100,14 +102,13 @@ void run_float_tests() {
 	assert(c->fr[5] == 60.0);
 
 	free_cpu(c);
-
 	printf("All integer tests passed\n");
 }
 
 void run_bitwise_tests() {
 	printf("Running tests on bitwise instructions\n");
 
-	u64 mem[] = {
+	i64 mem[] = {
 		LII, R0, 5,
 		LII, R1, 3,
 		LII, R2, 6,
@@ -130,15 +131,20 @@ void run_bitwise_tests() {
 	run_cpu(c);
 	print_registers(c);
 
-	free_cpu(c);
+	assert(c->r[0] == 7);
+	assert(c->r[1] == 5);
+	assert(c->r[4] == ~(i64)7);
+	assert(c->r[5] == 1);
+	assert(c->r[7] == 2);
 
+	free_cpu(c);
 	printf("All bitwise tests passed\n");
 }
 
 void run_logic_tests() {
 	printf("Running tests on logic instructions\n");
 
-	u64 mem[] = {
+	i64 mem[] = {
 		LII, R0, 1,
 		LII, R1, 0,
 		LII, R2, 1,
@@ -146,25 +152,46 @@ void run_logic_tests() {
 		LAND, R0, R1,
 		LOR, R1, R2,
 		LNOT, R3,
-		LII, R4, 5,
-		LII, R5, 6,
-		CMP, R4, R5,
-		JLZ, X,
-	    LDF, F0, 1.5,
-		LDF, F1, 1.5,
-		CMPF, F0, F1,
-		JEZ, X,
-		CMPFI, F0, 1,
-		JGZ, X
-		0, 0, 0
 		HLT
 	};
 
-	cpu *c = new_cpu(mem, 23);
+	cpu *c = new_cpu(mem, 21);
+	run_cpu(c);
+	print_registers(c);
+	
+	assert(c->r[0] == 0);
+	assert(c->r[1] == 1);
+	assert(c->r[3] == 0);
+
+	free_cpu(c);
+	printf("All logic tests passed\n");
+}
+
+void run_jump_tests() {
+	printf("Running tests on jump instructions\n");
+
+	i64 mem[] = {
+		LII, R0, 0,
+		LII, R1, 1,
+		INC, R1,
+		DEC, R1,
+		LII, R2, 2,
+		LII, R3, 1,
+		CMP, R0, R1,
+		JLZ, 30,
+		CMP, R1, R3,
+		JEZ, 32,
+		CMP, R1, R0,
+		JGZ, 34,
+		JMP, 20,
+		JMP, 25,
+		HLT
+	};
+
+	cpu *c = new_cpu(mem, 34);
 	run_cpu(c);
 	print_registers(c);
 
 	free_cpu(c);
-
-	printf("All logic tests passed\n");
+	printf("All jump tests passed\n");
 }

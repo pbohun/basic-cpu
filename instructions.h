@@ -10,6 +10,7 @@ enum instr {
 	LII, LIF,
 	PSH, POP,
 	PSHF, POPF,
+	INC, DEC,
 	ADD, SUB, MUL, DIV,
 	ADDF, SUBF, MULF, DIVF,
 	JLZ, JGZ, JEZ, JNZ, JMP,

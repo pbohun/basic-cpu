@@ -8,7 +8,7 @@ void clear_flags(cpu *c) {
 	c->gtz = 0;
 }
 
-void set_flags(cpu *c, u64 a, u64 b) {
+void set_flags(cpu *c, i64 a, i64 b) {
 	i64 res = a - b;
 	c->zero = (res == 0);
 	c->ltz = (res < 0);

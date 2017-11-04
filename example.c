@@ -5,18 +5,18 @@
 #include <stdlib.h>
 #include "cpu.h"
 
-void print_list(u64 *lst, int size) {
+void print_list(i64 *lst, int size) {
 	for (int i = 0; i < size - 1; i++) {
-		printf("%lu,", lst[i]);
+		printf("%llu,", lst[i]);
 	}
-	printf("%lu\n", lst[size-1]);
+	printf("%llu\n", lst[size-1]);
 }
 
 void print_registers(cpu *c) {
 	for (int i = 0; i < 7; i++) {
-		printf("%lu,", c->r[i]);
+		printf("%llu,", c->r[i]);
 	}
-	printf("%lu\n", c->r[7]);
+	printf("%llu\n", c->r[7]);
 }
 
 void print_fregisters(cpu *c) {
@@ -27,7 +27,7 @@ void print_fregisters(cpu *c) {
 }
 
 int main() {
-	u64 b[] = {
+	i64 b[] = {
 		LII, R0, 1,
 		LII, R1, 5,
 		LII, R2, 1,
@@ -40,7 +40,7 @@ int main() {
 	printf("instructions:\n");
 	print_list(b, 18);
 
-	// create new cpu with the given u64 array for memory
+	// create new cpu with the given i64 array for memory
 	cpu *c = new_cpu(b, 18);
 
 	run_cpu(c);

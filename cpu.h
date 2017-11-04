@@ -9,7 +9,7 @@
 void execute(cpu *c);
 void fetch(cpu *c);
 
-cpu *new_cpu(u64 *memory, u64 mem_size) {
+cpu *new_cpu(i64 *memory, i64 mem_size) {
 	cpu *c = malloc(sizeof(cpu));
 	c->mem = memory;
 	c->sp = mem_size - 1;
@@ -71,7 +71,7 @@ void execute(cpu *c) {
 			c->pc += 2;
 			break;
 		case STF:
-			c->mem[c->dest] = (u64)c->fr[c->src - 8];
+			c->mem[c->dest] = (i64)c->fr[c->src - 8];
 			c->pc += 2;
 			break;
 		case LDI:
@@ -94,13 +94,21 @@ void execute(cpu *c) {
 			c->mem[--c->sp] = c->r[c->mem[++c->pc]];
 			break;
 		case PSHF:
-			c->mem[--c->sp] = (u64)c->fr[c->mem[++c->pc]-8];
+			c->mem[--c->sp] = (i64)c->fr[c->mem[++c->pc]-8];
 			break;
 		case POP:
 			c->r[c->mem[++c->pc]] = c->mem[c->sp++];
 			break;
 		case POPF:
 			c->fr[c->mem[++c->pc]-8] = (f64)c->mem[c->sp++];
+			break;
+		case INC:
+			c->r[c->dest]++;
+			c->pc++;
+			break;
+		case DEC:
+			c->r[c->dest]--;
+			c->pc++;
 			break;
 		case ADD:
 			c->r[c->dest] += c->r[c->src];
@@ -170,7 +178,7 @@ void execute(cpu *c) {
 			c->pc += 2;
 			break;
 		case BNOT:
-			c->r[c->dest] = ~c->r[c->src];
+			c->r[c->dest] = ~c->r[c->dest];
 			c->pc++;
 			break;
 		case BXOR:
